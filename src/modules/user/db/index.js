@@ -3,7 +3,13 @@ import bcrypt from "bcrypt"
 
 
 export const signUpModel = async (data) => {
+    if (data?.role === "admin") {
+        const existingAdmin = await Model.findOne({ role: "admin" })
 
+        if (existingAdmin) {
+            throw new Error("ADMIN_ALREADY_EXISTS")
+        }
+    }
     const hashpassword = bcrypt.hashSync(data?.password, 10)
 
     const response = await new Model({
@@ -27,6 +33,9 @@ export const loginModel = async (data) => {
     const isPasswordValid = bcrypt.compareSync(data?.password, user.password)
     if (!isPasswordValid) {
         throw new Error("Invalid email or password");
+    }
+    if (data?.role !== user.role) {
+        throw new Error("INVALID_ROLE")
     }
 
     const response = user.toObject();

@@ -1,12 +1,16 @@
+import { generateToken } from "../../../utils/generateToken.js";
 import { loginModel } from "../db/index.js"
 
 export const loginService = async (data) => {
-    const user = await loginModel(data);
 
-    const token = generateToken(user._id);
+    try {
+        const user = await loginModel(data);
+    
+        const token = generateToken(user?._id,data?.role)
+        return { ...user, token }
+    } catch (err) {
+        console.log(err)
+        throw err
 
-    return {
-        ...user,
-        token
-    };
+    }
 };
